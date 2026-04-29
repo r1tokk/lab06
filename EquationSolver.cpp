@@ -51,7 +51,7 @@ double EquationSolver::solveDyhotomia(double a, double b, double epsilon, const 
             b = c;
         } else {
             a = c;
-            fa = fc; // Оптимізація: не обчислювати f(a) заново
+            fa = fc;
         }
 
         i++;
@@ -63,8 +63,6 @@ double EquationSolver::solveNewton(double x0, double epsilon, const std::functio
     double x1;
     int max_iterations = 1000;
 
-    // ДОЦІЛЬНЕ ВИКОРИСТАННЯ ЛЯМБДИ:
-    // Локальна лямбда для знаходження похідної функції f у точці x
     auto df = [&](double x) {
         double h = 1e-7;
         return (f(x + h) - f(x)) / h;
@@ -81,10 +79,10 @@ double EquationSolver::solveNewton(double x0, double epsilon, const std::functio
             return x0;
         }
 
-        double dfx = df(x0); // Виклик нашої локальної лямбди для похідної
+        double dfx = df(x0);
 
         if (areNearlyEqualToZero(dfx, 0.0)) {
-            x0 += 1e-6; // Уникнення ділення на нуль
+            x0 += 1e-9;
             continue;
         }
 
@@ -118,15 +116,12 @@ void startingPoint() {
         std::swap(a, b);
     }
 
-    // ДОЦІЛЬНЕ ВИКОРИСТАННЯ ЛЯМБДИ:
-    // Визначаємо нашу цільову функцію
     auto equationFunc = [](double x) {
         return std::sin(std::sqrt(x)) + (0.35 * x) - 3.8;
     };
 
     EquationSolver solver;
 
-    // Передаємо рівняння (лямбду) в методи
     double resultD = solver.solveDyhotomia(a, b, eps, equationFunc);
     double resultN = solver.solveNewton(10.0, eps, equationFunc);
 
